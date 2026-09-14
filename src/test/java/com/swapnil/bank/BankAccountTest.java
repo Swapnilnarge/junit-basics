@@ -64,5 +64,11 @@ class BankAccountTest {
         // Verify neither balance mutated when the transaction failed
         assertEquals(100.0, account.getBalance());
         assertEquals(50.0, recipient.getBalance());
+
+    }
+    @Test
+    void transfer_SameAccount_ThrowsExceptionAndLeavesBalanceUnchanged() {
+        assertThrows(IllegalArgumentException.class, () -> account.transfer(account, 20.0));
+        assertEquals(100.0, account.getBalance());
     }
 }

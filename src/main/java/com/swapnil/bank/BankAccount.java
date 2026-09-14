@@ -32,6 +32,9 @@ public class BankAccount {
         if (targetAccount == null) {
             throw new IllegalArgumentException("Account cannot be null.");
         }
+        if (targetAccount == this){
+            throw new IllegalArgumentException("Cannot transfer money to the same account.");
+        }
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than zero");
         }
