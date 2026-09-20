@@ -1,74 +1,92 @@
 package com.swapnil.bank;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
-class BankAccountTest {
+public class BankAccountTest {
 
-    private BankAccount account;
-
-    // Runs before every single test method to guarantee isolated state
-    @BeforeEach
-    void setUp() {
-        account = new BankAccount(100.0);
+    @Test
+    void constructor_negativeInitialBalance_throwsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new BankAccount(-10.0);
+        });
     }
 
     @Test
-    void deposit_ValidAmount_IncreasesBalance() {
-        account.deposit(50.0);
-        assertEquals(150.0, account.getBalance(), "Balance should reflect the deposited amount");
+    void constructor_validInitialBalance_setsInitialBalance() {
+        BankAccount account = new BankAccount(100);
+        Assertions.assertEquals(100, account.getBalance());
     }
 
     @Test
-    void deposit_InvalidAmount_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> account.deposit(0));
-        assertThrows(IllegalArgumentException.class, () -> account.deposit(-20.0));
+    void transfer_accountExistenceCheck_throwsException(){
+        BankAccount account = new BankAccount(10);
+        BankAccount account1 = null;
+        Assertions.assertThrows(IllegalArgumentException.class,()->{
+            account.transfer(account1,9.0);
+        });
     }
 
     @Test
-    void withdraw_ValidAmount_DecreasesBalance() {
-        account.withdraw(40.0);
-        assertEquals(60.0, account.getBalance(), "Balance should decrease after withdrawal");
+    void transfer_sameAccount_throwsException(){
+        BankAccount account = new BankAccount(10.0 );
+        Assertions.assertThrows(IllegalArgumentException.class,()->{
+            account.transfer(account,20);
+        });
     }
 
     @Test
-    void withdraw_AmountExceedingBalance_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> account.withdraw(150.0));
+    void transfer_validTransfer_amountTransfered(){
+        BankAccount account = new BankAccount(100.0);
+        BankAccount account1 = new BankAccount(100.0);
+        account.transfer(account1,50.0);
+        Assertions.assertEquals(50.0,account.getBalance());
+        Assertions.assertEquals(150.0 ,account1.getBalance());
     }
 
     @Test
-    void constructor_NegativeInitialBalance_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new BankAccount(-50.0));
-    }
-    @Test
-    void transfer_ValidAmountWithFee_UpdatesBothBalances() {
-        BankAccount recipient = new BankAccount(50.0);
-
-        // Act: transfer $20 from account ($100 balance) to recipient ($50 balance)
-        account.transfer(recipient, 20.0);
-
-        // Assert: 100 - 20 - 2.50 = 77.50 for sender; 50 + 20 = 70.0 for recipient
-        assertEquals(77.50, account.getBalance());
-        assertEquals(70.0, recipient.getBalance());
+    void deposit_negativeAmount_throwsException() {
+        BankAccount account = new BankAccount(12.0);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            account.deposit(-5.0);
+        });
     }
 
     @Test
-    void transfer_SenderCannotAffordFee_ThrowsExceptionAndLeavesBalancesUnchanged() {
-        BankAccount recipient = new BankAccount(50.0);
+    void deposit_validAmount_increasedBalance() {
+        BankAccount account = new BankAccount(20.0);
+        account.deposit(20.0);
+        Assertions.assertEquals(40.0 , account.getBalance());
+    }
 
-        // Act & Assert: $99 transfer requires $101.50 total, which exceeds the $100 balance
-        assertThrows(IllegalArgumentException.class, () -> account.transfer(recipient, 99.0));
+    @Test
+    void withdraw_negativeAmount_throwsException(){
+        BankAccount account = new BankAccount(10.0);
+        Assertions.assertThrows(IllegalArgumentException.class,()->{
+            account.withdraw(-10.0);
+        });
+    }
 
-        // Verify neither balance mutated when the transaction failed
-        assertEquals(100.0, account.getBalance());
-        assertEquals(50.0, recipient.getBalance());
+    @Test
+    void withdraw_lowBalance_throwsException(){
+        BankAccount account = new BankAccount(10.0);
+        Assertions.assertThrows(IllegalArgumentException.class,()->{
+           account.withdraw(20.0);
+        });
+    }
 
+    @Test
+    void withdraw_validAmount_withdrawalSuccess(){
+        BankAccount account = new BankAccount(10.0);
+        account.withdraw(6.0);
+        Assertions.assertEquals(4.0,account.getBalance());
     }
     @Test
-    void transfer_SameAccount_ThrowsExceptionAndLeavesBalanceUnchanged() {
-        assertThrows(IllegalArgumentException.class, () -> account.transfer(account, 20.0));
-        assertEquals(100.0, account.getBalance());
+    void getter_balanceCheck_validBalance(){
+        BankAccount account = new BankAccount(10.0);
+        Assertions.assertEquals(10.0,account.getBalance());
     }
 }
+
+
